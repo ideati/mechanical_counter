@@ -1,3 +1,7 @@
+## [0.0.2-dev.1] - 2021-05-07
+
+* Add: Color options and theme awareness.
+
 ## [0.0.2] - 2021-05-07
 
 * Add: Example and tests

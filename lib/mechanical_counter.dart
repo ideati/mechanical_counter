@@ -47,21 +47,30 @@ class __NumericWheelState extends State<_NumericWheel> {
       },
       child: Container(
         alignment: Alignment(0, 0),
-        color: Colors.grey,
+        color: Theme.of(context).backgroundColor,
         height: 80,
         width: 40,
         child: Column(children: [
           Text(
             '${(_currentValue == 0) ? widget.topValue : (_currentValue - 1)}',
-            style: TextStyle(color: Colors.grey[600], fontSize: 20),
+            style: TextStyle(
+              color: Theme.of(context).primaryColor.withAlpha(120),
+              fontSize: 20,
+            ),
           ),
           Text(
             '$_currentValue',
-            style: TextStyle(color: Colors.black, fontSize: 24),
+            style: TextStyle(
+              color: Theme.of(context).primaryColor,
+              fontSize: 24,
+            ),
           ),
           Text(
             '${(_currentValue == widget.topValue) ? 0 : (_currentValue + 1)}',
-            style: TextStyle(color: Colors.grey[600], fontSize: 20),
+            style: TextStyle(
+              color: Theme.of(context).primaryColor.withAlpha(120),
+              fontSize: 20,
+            ),
           ),
         ]),
       ),
@@ -86,7 +95,7 @@ class MechanicalCounter extends StatelessWidget {
   }) : super(key: key) {
     switch (style) {
       case "hh:mm:ss":
-        _wheels = [
+        _wheels.addAll([
           _NumericWheel(
             index: 0,
             onChanged: _changedDigit,
@@ -114,10 +123,10 @@ class MechanicalCounter extends StatelessWidget {
             index: 5,
             onChanged: _changedDigit,
           ),
-        ];
+        ]);
         break;
       case "hh:mm":
-        _wheels = [
+        _wheels.addAll([
           _NumericWheel(
             index: 0,
             onChanged: _changedDigit,
@@ -136,16 +145,16 @@ class MechanicalCounter extends StatelessWidget {
             index: 3,
             onChanged: _changedDigit,
           ),
-        ];
+        ]);
         break;
       default:
-        _wheels = List<_NumericWheel>.generate(
+        _wheels.addAll(List.generate(
           digits,
           (index) => _NumericWheel(
             index: index,
             onChanged: _changedDigit,
           ),
-        );
+        ));
         break;
     }
     assert(style != 'number' || digits != null);
@@ -153,13 +162,13 @@ class MechanicalCounter extends StatelessWidget {
   final digits;
   final ValueChanged<int> onChanged;
   final style;
-  List<_NumericWheel>? _wheels;
+  final List<_NumericWheel> _wheels = [];
 
   void _changedDigit(int index, int newValue) {}
 
   get value {
     String ans = "";
-    for (int i = 0; i < _wheels!.length; i++) {
+    for (int i = 0; i < _wheels.length; i++) {
       ans += "0"; //'${_wheels![i]}';
     }
     return ans;
@@ -174,8 +183,8 @@ class MechanicalCounter extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _wheels![0],
-              _wheels![1],
+              _wheels[0],
+              _wheels[1],
               Text(
                 ":",
                 style: TextStyle(
@@ -184,8 +193,8 @@ class MechanicalCounter extends StatelessWidget {
                   fontSize: 24,
                 ),
               ),
-              _wheels![2],
-              _wheels![3],
+              _wheels[2],
+              _wheels[3],
               Text(
                 ":",
                 style: TextStyle(
@@ -194,8 +203,8 @@ class MechanicalCounter extends StatelessWidget {
                   fontSize: 24,
                 ),
               ),
-              _wheels![4],
-              _wheels![5],
+              _wheels[4],
+              _wheels[5],
             ],
           ),
         );
@@ -205,8 +214,8 @@ class MechanicalCounter extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _wheels![0],
-              _wheels![1],
+              _wheels[0],
+              _wheels[1],
               Text(
                 ":",
                 style: TextStyle(
@@ -215,8 +224,8 @@ class MechanicalCounter extends StatelessWidget {
                   fontSize: 24,
                 ),
               ),
-              _wheels![2],
-              _wheels![3],
+              _wheels[2],
+              _wheels[3],
             ],
           ),
         );
@@ -225,7 +234,7 @@ class MechanicalCounter extends StatelessWidget {
           width: (40.0 * digits + 20),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: _wheels!,
+            children: _wheels,
           ),
         );
     }
