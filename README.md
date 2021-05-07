@@ -4,7 +4,7 @@
 
 A Flutter plugin for iOS and Android for interacting with numbers from a familiar interface mimicking a mechanical digital counter.
 
-|    Real thing     |    Android    |
+|    Real thing     |   In Chrome    |
 | :---------------------: | :-------------------: |
 | ![](assets/images/model01.jpg) | ![](assets/images/screen01.jpg) |
 
