@@ -3,35 +3,47 @@ library mechanical_counter;
 import 'package:flutter/material.dart';
 
 class _NumericWheel extends StatefulWidget {
-  _NumericWheel({this.topValue = 9});
+  _NumericWheel({
+    required this.onChanged,
+    required this.index,
+    this.topValue = 9,
+    this.initialValue = 0,
+  }) : assert(initialValue >= 0 && initialValue <= topValue);
+  final int index;
   final int topValue;
-  int _currentValue = 0;
-
-  get value {
-    return _currentValue;
-  }
+  final int initialValue;
+  final Function onChanged;
 
   @override
   __NumericWheelState createState() => __NumericWheelState();
 }
 
 class __NumericWheelState extends State<_NumericWheel> {
+  int _currentValue = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentValue = widget.initialValue;
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onVerticalDragUpdate: (DragUpdateDetails details) {
-        if (details.delta.dy < -5)
+        if (details.delta.dy < -5) {
           setState(() {
-            widget._currentValue++;
-            if (widget._currentValue > widget.topValue)
-              widget._currentValue = 0;
+            _currentValue++;
+            if (_currentValue > widget.topValue) _currentValue = 0;
           });
-        else if (details.delta.dy > 5)
+          widget.onChanged(widget.index, _currentValue);
+        } else if (details.delta.dy > 5) {
           setState(() {
-            widget._currentValue--;
-            if (widget._currentValue < 0)
-              widget._currentValue = widget.topValue;
+            _currentValue--;
+            if (_currentValue < 0) _currentValue = widget.topValue;
           });
+          widget.onChanged(widget.index, _currentValue);
+        }
       },
       child: Container(
         alignment: Alignment(0, 0),
@@ -40,15 +52,15 @@ class __NumericWheelState extends State<_NumericWheel> {
         width: 40,
         child: Column(children: [
           Text(
-            '${(widget._currentValue == 0) ? widget.topValue : (widget._currentValue - 1)}',
+            '${(_currentValue == 0) ? widget.topValue : (_currentValue - 1)}',
             style: TextStyle(color: Colors.grey[600], fontSize: 20),
           ),
           Text(
-            '${widget._currentValue}',
+            '$_currentValue',
             style: TextStyle(color: Colors.black, fontSize: 24),
           ),
           Text(
-            '${(widget._currentValue == widget.topValue) ? 0 : (widget._currentValue + 1)}',
+            '${(_currentValue == widget.topValue) ? 0 : (_currentValue + 1)}',
             style: TextStyle(color: Colors.grey[600], fontSize: 20),
           ),
         ]),
@@ -68,42 +80,87 @@ class __NumericWheelState extends State<_NumericWheel> {
 class MechanicalCounter extends StatelessWidget {
   MechanicalCounter({
     Key? key,
+    required this.onChanged,
     this.digits = 1,
     this.style = 'number',
   }) : super(key: key) {
     switch (style) {
       case "hh:mm:ss":
         _wheels = [
-          _NumericWheel(topValue: 2),
-          _NumericWheel(),
-          _NumericWheel(topValue: 5),
-          _NumericWheel(),
-          _NumericWheel(topValue: 5),
-          _NumericWheel(),
+          _NumericWheel(
+            index: 0,
+            onChanged: _changedDigit,
+            topValue: 2, //Hours
+          ),
+          _NumericWheel(
+            index: 1,
+            onChanged: _changedDigit,
+          ),
+          _NumericWheel(
+            index: 2,
+            onChanged: _changedDigit,
+            topValue: 5, //Minutes
+          ),
+          _NumericWheel(
+            index: 3,
+            onChanged: _changedDigit,
+          ),
+          _NumericWheel(
+            index: 4,
+            onChanged: _changedDigit,
+            topValue: 5, //Seconds
+          ),
+          _NumericWheel(
+            index: 5,
+            onChanged: _changedDigit,
+          ),
         ];
         break;
       case "hh:mm":
         _wheels = [
-          _NumericWheel(topValue: 2),
-          _NumericWheel(),
-          _NumericWheel(topValue: 5),
-          _NumericWheel(),
+          _NumericWheel(
+            index: 0,
+            onChanged: _changedDigit,
+            topValue: 2, // Hours
+          ),
+          _NumericWheel(
+            index: 1,
+            onChanged: _changedDigit,
+          ),
+          _NumericWheel(
+            index: 2, // Minutes
+            onChanged: _changedDigit,
+            topValue: 5,
+          ),
+          _NumericWheel(
+            index: 3,
+            onChanged: _changedDigit,
+          ),
         ];
         break;
       default:
-        _wheels = List<_NumericWheel>.filled(digits, _NumericWheel());
+        _wheels = List<_NumericWheel>.generate(
+          digits,
+          (index) => _NumericWheel(
+            index: index,
+            onChanged: _changedDigit,
+          ),
+        );
         break;
     }
     assert(style != 'number' || digits != null);
   }
   final digits;
+  final ValueChanged<int> onChanged;
   final style;
   List<_NumericWheel>? _wheels;
+
+  void _changedDigit(int index, int newValue) {}
 
   get value {
     String ans = "";
     for (int i = 0; i < _wheels!.length; i++) {
-      ans += '${_wheels![i].value}';
+      ans += "0"; //'${_wheels![i]}';
     }
     return ans;
   }
