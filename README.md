@@ -49,9 +49,9 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text('Mechanical Counter Example'),
       ),
       body: Center(
-				MechanicalCounter(
-					digits: 6,
-				),
+        MechanicalCounter(
+          digits: 6,
+        ),
       ),
     );
   }
