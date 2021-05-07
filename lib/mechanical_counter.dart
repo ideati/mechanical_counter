@@ -176,10 +176,24 @@ class MechanicalCounter extends StatelessWidget {
             children: [
               _wheels![0],
               _wheels![1],
-              Text(":"),
+              Text(
+                ":",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                ),
+              ),
               _wheels![2],
               _wheels![3],
-              Text(":"),
+              Text(
+                ":",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                ),
+              ),
               _wheels![4],
               _wheels![5],
             ],
@@ -193,7 +207,14 @@ class MechanicalCounter extends StatelessWidget {
             children: [
               _wheels![0],
               _wheels![1],
-              Text(":"),
+              Text(
+                ":",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                ),
+              ),
               _wheels![2],
               _wheels![3],
             ],

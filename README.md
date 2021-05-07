@@ -6,7 +6,7 @@ A Flutter plugin for iOS and Android for interacting with numbers from a familia
 
 |    Real thing     |   In Chrome    |
 | :---------------------: | :-------------------: |
-| ![](assets/images/model01.jpg) | ![](assets/images/screen01.jpg) |
+| ![](example/assets/images/model01.jpg) | ![](example/assets/images/screen01.png) |
 
 ## Installation
 
@@ -55,6 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         MechanicalCounter(
           digits: 6,
+          onChanged: (newValue) => print("Value changed to $newValue")),
         ),
       ),
     );

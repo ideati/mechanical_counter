@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../lib/mechanical_counter.dart';
+import 'package:mechanical_counter/mechanical_counter.dart';
 
 void main() {
   runApp(MyApp());
@@ -39,7 +39,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             Text(
               "This counter has style: 'number' by default",
@@ -50,9 +50,9 @@ class _MyHomePageState extends State<MyHomePage> {
             Text(
               "And this is meant to resemble a clock, style: 'hh:mm:ss'",
             ),
-//            MechanicalCounter(
-//                style: "hh:mm:ss",
-//                onChanged: (newValue) => print("Value changed to $newValue"))
+            MechanicalCounter(
+                style: "hh:mm:ss",
+                onChanged: (newValue) => print("Value changed to $newValue"))
           ],
         ),
       ),
