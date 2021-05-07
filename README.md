@@ -4,6 +4,10 @@
 
 A Flutter plugin for iOS and Android for interacting with numbers from a familiar interface mimicking a mechanical digital counter.
 
+|    Real thing     |    Android    |
+| :---------------------: | :-------------------: |
+| ![](assets/images/model01.jpg) | ![](assets/images/screen01.jpg) |
+
 ## Installation
 
 First, add `mechanical_counter` as a [dependency in your pubspec.yaml file](https://flutter.io/platform-plugins/).
