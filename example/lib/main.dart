@@ -46,12 +46,15 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             MechanicalCounter(
                 digits: 6,
+                initialValue: 12345678,
+                color: Colors.red,
+                backgroundColor: Colors.amber,
                 onChanged: (newValue) => print("Value changed to $newValue")),
             Text(
               "And this is meant to resemble a clock, style: 'hh:mm:ss'",
             ),
             MechanicalCounter(
-                style: "hh:mm:ss",
+                format: "hh:mm:ss",
                 onChanged: (newValue) => print("Value changed to $newValue"))
           ],
         ),

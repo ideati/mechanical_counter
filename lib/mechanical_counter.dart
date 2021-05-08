@@ -6,9 +6,13 @@ class _NumericWheel extends StatefulWidget {
   _NumericWheel({
     required this.onChanged,
     required this.index,
+    required this.color,
+    required this.backgroundColor,
     this.topValue = 9,
     this.initialValue = 0,
   }) : assert(initialValue >= 0 && initialValue <= topValue);
+  final Color color;
+  final Color backgroundColor;
   final int index;
   final int topValue;
   final int initialValue;
@@ -30,6 +34,13 @@ class __NumericWheelState extends State<_NumericWheel> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      onTap: () {
+        setState(() {
+          _currentValue++;
+          if (_currentValue > widget.topValue) _currentValue = 0;
+        });
+        widget.onChanged(widget.index, _currentValue);
+      },
       onVerticalDragUpdate: (DragUpdateDetails details) {
         if (details.delta.dy < -5) {
           setState(() {
@@ -47,28 +58,28 @@ class __NumericWheelState extends State<_NumericWheel> {
       },
       child: Container(
         alignment: Alignment(0, 0),
-        color: Theme.of(context).backgroundColor,
+        color: widget.backgroundColor,
         height: 80,
         width: 40,
         child: Column(children: [
           Text(
             '${(_currentValue == 0) ? widget.topValue : (_currentValue - 1)}',
             style: TextStyle(
-              color: Theme.of(context).primaryColor.withAlpha(120),
+              color: widget.color.withAlpha(120),
               fontSize: 20,
             ),
           ),
           Text(
             '$_currentValue',
             style: TextStyle(
-              color: Theme.of(context).primaryColor,
+              color: widget.color,
               fontSize: 24,
             ),
           ),
           Text(
             '${(_currentValue == widget.topValue) ? 0 : (_currentValue + 1)}',
             style: TextStyle(
-              color: Theme.of(context).primaryColor.withAlpha(120),
+              color: widget.color.withAlpha(120),
               fontSize: 20,
             ),
           ),
@@ -83,158 +94,208 @@ class __NumericWheelState extends State<_NumericWheel> {
 ///
 /// A container encloses the minimal size for a useful interaction in touch
 /// screens.
-/// [style] defines the type of target number. Currently it could be
+/// [format] defines the type of target number. Currently it could be
 /// `number` (default) or time in the form of: `hh:mm:ss`, `hh:mm`
 /// [digits] defines the number of digits for the `number` type.
+/// [initialValue] set the starting values for each digit. If the value given
+/// has more digits than [digits], extra digits are discarded.
+/// For the clock formats, [initialValues] are the digits without colons (:).
+/// Ie: for 23:59:59 -> initialValue: 235959.
 class MechanicalCounter extends StatelessWidget {
   MechanicalCounter({
     Key? key,
     required this.onChanged,
+    this.color,
+    this.backgroundColor,
+    this.format = 'number',
     this.digits = 1,
-    this.style = 'number',
-  }) : super(key: key) {
-    switch (style) {
-      case "hh:mm:ss":
-        _wheels.addAll([
-          _NumericWheel(
-            index: 0,
-            onChanged: _changedDigit,
-            topValue: 2, //Hours
-          ),
-          _NumericWheel(
-            index: 1,
-            onChanged: _changedDigit,
-          ),
-          _NumericWheel(
-            index: 2,
-            onChanged: _changedDigit,
-            topValue: 5, //Minutes
-          ),
-          _NumericWheel(
-            index: 3,
-            onChanged: _changedDigit,
-          ),
-          _NumericWheel(
-            index: 4,
-            onChanged: _changedDigit,
-            topValue: 5, //Seconds
-          ),
-          _NumericWheel(
-            index: 5,
-            onChanged: _changedDigit,
-          ),
-        ]);
-        break;
-      case "hh:mm":
-        _wheels.addAll([
-          _NumericWheel(
-            index: 0,
-            onChanged: _changedDigit,
-            topValue: 2, // Hours
-          ),
-          _NumericWheel(
-            index: 1,
-            onChanged: _changedDigit,
-          ),
-          _NumericWheel(
-            index: 2, // Minutes
-            onChanged: _changedDigit,
-            topValue: 5,
-          ),
-          _NumericWheel(
-            index: 3,
-            onChanged: _changedDigit,
-          ),
-        ]);
-        break;
-      default:
-        _wheels.addAll(List.generate(
-          digits,
-          (index) => _NumericWheel(
-            index: index,
-            onChanged: _changedDigit,
-          ),
-        ));
-        break;
-    }
-    assert(style != 'number' || digits != null);
-  }
+    this.initialValue = 0,
+  })  : assert(format != 'number' || digits != null),
+        super(key: key);
+
+  final Color? color;
+  final Color? backgroundColor;
+  final initialValue;
+  final format;
   final digits;
   final ValueChanged<int> onChanged;
-  final style;
-  final List<_NumericWheel> _wheels = [];
+  final List<int> _values = [];
 
-  void _changedDigit(int index, int newValue) {}
+  void _changedDigit(int index, int newValue) {
+    _values[index] = newValue;
+    onChanged(this.value);
+  }
 
   get value {
-    String ans = "";
-    for (int i = 0; i < _wheels.length; i++) {
-      ans += "0"; //'${_wheels![i]}';
+    int _digits;
+    switch (format) {
+      case "hh:mm:ss":
+        _digits = 6;
+        break;
+      case "hh:mm":
+        _digits = 4;
+        break;
+      default:
+        _digits = digits;
     }
-    return ans;
+    String ans = "";
+    for (int i = 0; i < _digits; i++) ans += '${_values[i]}';
+    return int.parse(ans);
   }
 
   @override
   Widget build(context) {
-    switch (style) {
+    Color _color;
+    Color _backgroundColor;
+    if (color == null) {
+      _color = Theme.of(context).primaryColor;
+    } else {
+      _color = color!;
+    }
+    if (backgroundColor == null) {
+      _backgroundColor = Theme.of(context).backgroundColor;
+    } else {
+      _backgroundColor = backgroundColor!;
+    }
+    switch (format) {
       case "hh:mm:ss":
+        final initialStr = initialValue.toString().padLeft(6, '0');
+        for (int i = 0; i < 6; i++) _values.add(int.parse(initialStr[i]));
         return Container(
           width: (300),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _wheels[0],
-              _wheels[1],
+              _NumericWheel(
+                index: 0,
+                initialValue: _values[0],
+                onChanged: _changedDigit,
+                color: _color,
+                backgroundColor: _backgroundColor,
+                topValue: 2, //Hours
+              ),
+              _NumericWheel(
+                index: 1,
+                initialValue: _values[1],
+                onChanged: _changedDigit,
+                color: _color,
+                backgroundColor: _backgroundColor,
+              ),
               Text(
                 ":",
                 style: TextStyle(
-                  color: Colors.black,
+                  color: _color,
                   fontWeight: FontWeight.bold,
                   fontSize: 24,
                 ),
               ),
-              _wheels[2],
-              _wheels[3],
+              _NumericWheel(
+                index: 2,
+                initialValue: _values[2],
+                onChanged: _changedDigit,
+                color: _color,
+                backgroundColor: _backgroundColor,
+                topValue: 5, //Minutes
+              ),
+              _NumericWheel(
+                index: 3,
+                initialValue: _values[3],
+                onChanged: _changedDigit,
+                color: _color,
+                backgroundColor: _backgroundColor,
+              ),
               Text(
                 ":",
                 style: TextStyle(
-                  color: Colors.black,
+                  color: _color,
                   fontWeight: FontWeight.bold,
                   fontSize: 24,
                 ),
               ),
-              _wheels[4],
-              _wheels[5],
+              _NumericWheel(
+                index: 4,
+                initialValue: _values[4],
+                onChanged: _changedDigit,
+                color: _color,
+                backgroundColor: _backgroundColor,
+                topValue: 5, //Seconds
+              ),
+              _NumericWheel(
+                index: 5,
+                initialValue: _values[5],
+                onChanged: _changedDigit,
+                color: _color,
+                backgroundColor: _backgroundColor,
+              ),
             ],
           ),
         );
       case "hh:mm":
+        final initialStr = initialValue.toString().padLeft(4, '0');
+        for (int i = 0; i < 4; i++) _values.add(int.parse(initialStr[i]));
         return Container(
           width: (200),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _wheels[0],
-              _wheels[1],
+              _NumericWheel(
+                index: 0,
+                initialValue: _values[0],
+                onChanged: _changedDigit,
+                color: _color,
+                backgroundColor: _backgroundColor,
+                topValue: 2, //Hours
+              ),
+              _NumericWheel(
+                index: 1,
+                initialValue: _values[1],
+                onChanged: _changedDigit,
+                color: _color,
+                backgroundColor: _backgroundColor,
+              ),
               Text(
                 ":",
                 style: TextStyle(
-                  color: Colors.black,
+                  color: _color,
                   fontWeight: FontWeight.bold,
                   fontSize: 24,
                 ),
               ),
-              _wheels[2],
-              _wheels[3],
+              _NumericWheel(
+                index: 2,
+                initialValue: _values[2],
+                onChanged: _changedDigit,
+                color: _color,
+                backgroundColor: _backgroundColor,
+                topValue: 5, //Minutes
+              ),
+              _NumericWheel(
+                index: 3,
+                initialValue: _values[3],
+                onChanged: _changedDigit,
+                color: _color,
+                backgroundColor: _backgroundColor,
+              ),
             ],
           ),
         );
       default:
+        final initialStr = initialValue.toString().padLeft(digits, '0');
+        _values.addAll(initialStr.split("").map(int.parse).toList());
         return Container(
           width: (40.0 * digits + 20),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: _wheels,
+            children: List.generate(
+              digits,
+              (index) => _NumericWheel(
+                index: index,
+                color: _color,
+                backgroundColor: _backgroundColor,
+                initialValue: _values[index],
+                onChanged: _changedDigit,
+              ),
+            ),
           ),
         );
     }

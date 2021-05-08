@@ -13,7 +13,8 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.2
-  mechanical_counter: ^0.0.2-dev.1
+  mechanical_counter:
+    path: ../
 
 dev_dependencies:
   flutter_test:

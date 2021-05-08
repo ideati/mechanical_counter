@@ -77,10 +77,10 @@ packages:
   mechanical_counter:
     dependency: "direct main"
     description:
-      name: mechanical_counter
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.0.2"
+      path: ".."
+      relative: true
+    source: path
+    version: "1.0.0"
   meta:
     dependency: transitive
     description:

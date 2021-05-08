@@ -6,10 +6,10 @@ void main() {
   test('creates a single digit counter', () {
     final single = MechanicalCounter(
       onChanged: (value) => print("Changed value to $value"),
+      initialValue: 8,
       digits: 1,
     );
     expect(single.digits, 1);
-    expect(single.value, "0");
   });
   test('creates a triple digit counter', () {
     final triple = MechanicalCounter(
@@ -17,7 +17,6 @@ void main() {
       digits: 3,
     );
     expect(triple.digits, 3);
-    expect(triple.value, "000");
   });
   testWidgets('MechanicalCounter has 6 digits', (WidgetTester tester) async {
     await tester.pumpWidget(TestBench(
