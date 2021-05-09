@@ -2,6 +2,8 @@ library mechanical_counter;
 
 import 'package:flutter/material.dart';
 
+/// Numeric wheels are handled internally. They are not intended
+/// to be used directly by outside code
 class _NumericWheel extends StatefulWidget {
   _NumericWheel({
     required this.onChanged,
@@ -42,13 +44,13 @@ class __NumericWheelState extends State<_NumericWheel> {
         widget.onChanged(widget.index, _currentValue);
       },
       onVerticalDragUpdate: (DragUpdateDetails details) {
-        if (details.delta.dy < -5) {
+        if (details.delta.dy < -4) {
           setState(() {
             _currentValue++;
             if (_currentValue > widget.topValue) _currentValue = 0;
           });
           widget.onChanged(widget.index, _currentValue);
-        } else if (details.delta.dy > 5) {
+        } else if (details.delta.dy > 4) {
           setState(() {
             _currentValue--;
             if (_currentValue < 0) _currentValue = widget.topValue;
@@ -92,15 +94,8 @@ class __NumericWheelState extends State<_NumericWheel> {
 /// A convenience widget that presents an interface for changing numeric values
 /// using simple touch gestures.
 ///
-/// A container encloses the minimal size for a useful interaction in touch
-/// screens.
-/// [format] defines the type of target number. Currently it could be
-/// `number` (default) or time in the form of: `hh:mm:ss`, `hh:mm`
-/// [digits] defines the number of digits for the `number` type.
-/// [initialValue] set the starting values for each digit. If the value given
-/// has more digits than [digits], extra digits are discarded.
-/// For the clock formats, [initialValues] are the digits without colons (:).
-/// Ie: for 23:59:59 -> initialValue: 235959.
+/// A container encloses the minimal size needed for a useful interaction
+/// by touch gestures. Swipe up and down or tap for single increment.
 class MechanicalCounter extends StatelessWidget {
   MechanicalCounter({
     Key? key,
@@ -113,20 +108,43 @@ class MechanicalCounter extends StatelessWidget {
   })  : assert(format != 'number' || digits != null),
         super(key: key);
 
-  final Color? color;
-  final Color? backgroundColor;
-  final initialValue;
+  /// [format] defines the type of target number. Currently it could be
+  /// `number` (default) or time in the form of: `hh:mm:ss`, `hh:mm`
   final format;
+
+  /// [digits] defines the number of digits for the `number` format. For the
+  /// other formats, it has no effect.
   final digits;
-  final ValueChanged<int> onChanged;
+
+  /// [initialValue] set the starting values for each digit. If the value given
+  /// has more digits than [digits], extra digits are discarded.
+  /// For the clock formats, [initialValues] are the digits without colons (:).
+  /// Ie: for 23:59:59 -> initialValue: 235959.
+  final initialValue;
+
+  /// Optional [color] for numbers and symbols. If not given, the theme's
+  /// primaryColor is used
+  final Color? color;
+
+  /// Optional [backgroundColor] for the body of the counter. If not given, the
+  /// theme's backgroundColor is used.
+  final Color? backgroundColor;
+
+  /// Required [onChanged] is called when the user modifies the number by tapping
+  /// or swipping on the counter's face.
+  final ValueChanged<String> onChanged;
+
+  /// Internal tracker for individual values
   final List<int> _values = [];
 
+  /// Internal function to track individual digit changes
   void _changedDigit(int index, int newValue) {
     _values[index] = newValue;
     onChanged(this.value);
   }
 
-  get value {
+  /// Internal initialization routine
+  int _init() {
     int _digits;
     switch (format) {
       case "hh:mm:ss":
@@ -138,9 +156,27 @@ class MechanicalCounter extends StatelessWidget {
       default:
         _digits = digits;
     }
-    String ans = "";
-    for (int i = 0; i < _digits; i++) ans += '${_values[i]}';
-    return int.parse(ans);
+    if (_values.length == 0) {
+      _values.clear();
+      final initialStr = initialValue.toString().padLeft(6, '0');
+      for (int i = 0; i < _digits; i++) _values.add(int.parse(initialStr[i]));
+    }
+    return _digits;
+  }
+
+  /// Actual display value as a String, according to [format].
+  get value {
+    final _digits = _init();
+    switch (format) {
+      case "hh:mm:ss":
+        return '${_values[0]}${_values[1]}:${_values[2]}${_values[3]}:${_values[4]}${_values[5]}';
+      case "hh:mm":
+        return '${_values[0]}${_values[1]}:${_values[2]}${_values[3]}';
+      default:
+        String ans = "";
+        for (int i = 0; i < _digits; i++) ans += '${_values[i]}';
+        return ans;
+    }
   }
 
   @override
@@ -157,10 +193,11 @@ class MechanicalCounter extends StatelessWidget {
     } else {
       _backgroundColor = backgroundColor!;
     }
+    if (_values.length == 0) {
+      _init();
+    }
     switch (format) {
       case "hh:mm:ss":
-        final initialStr = initialValue.toString().padLeft(6, '0');
-        for (int i = 0; i < 6; i++) _values.add(int.parse(initialStr[i]));
         return Container(
           width: (300),
           child: Row(
@@ -231,8 +268,6 @@ class MechanicalCounter extends StatelessWidget {
           ),
         );
       case "hh:mm":
-        final initialStr = initialValue.toString().padLeft(4, '0');
-        for (int i = 0; i < 4; i++) _values.add(int.parse(initialStr[i]));
         return Container(
           width: (200),
           child: Row(
@@ -280,8 +315,6 @@ class MechanicalCounter extends StatelessWidget {
           ),
         );
       default:
-        final initialStr = initialValue.toString().padLeft(digits, '0');
-        _values.addAll(initialStr.split("").map(int.parse).toList());
         return Container(
           width: (40.0 * digits + 20),
           child: Row(

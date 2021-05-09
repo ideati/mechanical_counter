@@ -1,6 +1,6 @@
 name: mechanical_counter
 description: Minimalist interface mimicking a mechanical digital counter.
-version: 1.0.0
+version: 1.0.1
 homepage: https://github.com/ideati/mechanical_counter
 maintainer: Jorge M. Peláez
 

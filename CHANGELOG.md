@@ -1,3 +1,9 @@
+## [1.0.1] - 2021-05-09
+
+* Fix: [onChange] gets the [newValue] as string, according to [format].
+* Fix: Wrong initializer when [initialValue] got default values.
+* Add: Improved documentation.
+
 ## [1.0.0] - 2021-05-08
 
 * Features frozen for the first release, production ready.
@@ -12,7 +18,7 @@
 ## [0.0.2] - 2021-05-07
 
 * Add: Example and tests
-* Add: Configuration: initialValue, onChange event.
+* Add: Configuration: [initialValue], [onChange] event.
 
 ## [0.0.1] - 2021-05-05
 
